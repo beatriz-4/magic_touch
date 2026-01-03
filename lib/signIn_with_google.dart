@@ -16,7 +16,6 @@ class GoogleAuthService {
   /// Returns `null` if the sign-in process is canceled or fails.
   Future<User?> signInWithGoogle() async {
     try {
-
       // Trigger the Google Sign-In flow.
       final googleUser = await _googleSignIn.signIn();
 
@@ -38,7 +37,6 @@ class GoogleAuthService {
       // Return the authenticated user.
       return userCredential.user;
     } catch (e) {
-
       // Print the error and return null if an exception occurs.
       print("Sign-in error: $e");
       return null;
