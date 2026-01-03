@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:magic_touch/signIn_with_google.dart';
+import 'component/square_tile.dart';
 import 'forgot_password_page.dart';
 import 'staff_main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -146,26 +148,47 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
                   ),
                   SizedBox(height: 50),
                   SizedBox(
-                    width: 325,
-                    height: 50,
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : loginStaff,
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                        backgroundColor: Color(0xFFB3B3B3),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        backgroundColor: Color(0xFF688E73),
+                        elevation: 5,
                       ),
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                        "Next",
-                        style: TextStyle(fontSize: 13, color: Colors.white),
-                      ),
+                          : Text("Next"),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 70),
+                  Row(
+                    children: [
+                      Expanded(
+                          child:
+                          Divider(thickness: 1.5, color: Colors.grey)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          "Or continue with",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child:
+                          Divider(thickness: 1.5, color: Colors.grey)),
+                    ],
+                  ),
+                  SizedBox(height:50),
+                  SquareTile(
+                      imagePath: 'assets/images/google.png',
+                      onTap: () =>GoogleAuthService().signInWithGoogle()
+                  ),
                 ],
               ),
             ),

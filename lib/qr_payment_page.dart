@@ -52,7 +52,7 @@ class _QRPaymentPageState extends State<QRPaymentPage> {
           'time': item['time'],
           'serviceName': item['name'],
           'name': userData?["name"] ?? '',
-          'status': 'UPCOMING',
+          'status': 'Upcoming',
           'paymentMethod': 'QR',
           'bookingRef': widget.bookingRef,
           'amount': totalAmount,

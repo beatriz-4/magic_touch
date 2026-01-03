@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting date
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:magic_touch/component/square_tile.dart';
+import 'package:magic_touch/customer_login_page.dart';
+import 'package:magic_touch/signIn_with_google.dart';
 import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -10,6 +13,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final GoogleAuthService _authService = GoogleAuthService();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -180,10 +184,41 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 35),
+              //Divider
+              Row(
+                children: [
+                  Expanded(
+                      child:
+                      Divider(thickness: 1.5, color: Colors.grey)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      "Or continue with",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child:
+                      Divider(thickness: 1.5, color: Colors.grey)),
+                ],
+              ),
+              SizedBox(height: 35),
+              SquareTile(
+                imagePath: 'assets/images/google.png',
+                  onTap: () =>GoogleAuthService().signInWithGoogle()),
+              SizedBox(height: 35),
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => CustomerLoginPage()));
                 },
                 child: Text(
                   "Already have an account? Login",

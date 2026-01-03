@@ -17,6 +17,27 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  bool isLoading = true; // track loading state
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData(); // fetch user data once
+  }
+
+  Future<void> loadUserData() async {
+    final data = await getUserData();
+    if (data != null) {
+      nameController.text = data['name'] ?? '';
+      emailController.text = data['email'] ?? '';
+      phoneController.text = data['phone'] ?? '';
+      dobController.text = data['birthday'] ?? '';
+    }
+    setState(() {
+      isLoading = false; // hide loader
+    });
+  }
+
   void saveProfile() {
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,84 +84,68 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Color(0xFFF2F7E2),
+        appBar: AppBar(
+          title: Text("Profile"),
+          centerTitle: true,
+          backgroundColor: Color(0xFF688E73),
+        ),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Color(0xFFF2F7E2),
-
       appBar: AppBar(
         title: Text("Profile"),
         centerTitle: true,
         backgroundColor: Color(0xFF688E73),
       ),
-
-      body: FutureBuilder<Map<String, dynamic>?>(
-          future: getUserData(), // fetch all user data
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            if (!snapshot.hasData || snapshot.data == null) {
-              return Center(child: Text("No user data found"));
-            }
-            final userData = snapshot.data!;
-            // Initialize controllers with userData
-            nameController.text = userData['name'] ?? '';
-            emailController.text = userData['email'] ?? '';
-            phoneController.text = userData['phone'] ?? '';
-            dobController.text = userData['birthday'] ?? '';
-
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  buildField("Name", nameController),
-                  buildField("Email", emailController),
-                  buildField("Phone", phoneController),
-
-                  buildField(
-                    "Date of Birth",
-                    dobController,
-                    readOnly: true,
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime(1990, 1, 1),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
-                      );
-                      if (pickedDate != null) {
-                        dobController.text =
-                        "${pickedDate.day}/${pickedDate.month}/${pickedDate
-                            .year}";
-                      }
-                    },
-                  ),
-
-                  buildField("Password", passwordController, obscure: true),
-                  buildField("Confirm Password", confirmPasswordController,
-                      obscure: true),
-
-                  SizedBox(height: 10),
-
-                  // SAVE BUTTON
-                  ElevatedButton(
-                    onPressed: saveProfile,
-                    child: Text("Save Changes", style: TextStyle(fontSize: 18)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF688E73),
-                      minimumSize: Size(double.infinity, 55),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-                ],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: [
+            buildField("Name", nameController),
+            buildField("Email", emailController),
+            buildField("Phone", phoneController),
+            buildField(
+              "Date of Birth",
+              dobController,
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime(1990, 1, 1),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  dobController.text =
+                  "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                }
+              },
+            ),
+            buildField("Password", passwordController, obscure: true),
+            buildField(
+                "Confirm Password", confirmPasswordController,
+                obscure: true),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: saveProfile,
+              child: Text("Save Changes", style: TextStyle(fontSize: 18)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF688E73),
+                minimumSize: Size(double.infinity, 55),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-
-            );
-          },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
