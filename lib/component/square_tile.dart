@@ -1,17 +1,20 @@
 
 import 'package:flutter/material.dart';
 
-class SquareTile extends StatelessWidget{
+class SquareTile extends StatelessWidget {
   final String imagePath;
   final Function()? onTap;
+  final double? height; // new optional height parameter
+
   const SquareTile({
     super.key,
     required this.imagePath,
     required this.onTap,
-});
+    this.height, // accept it in constructor
+  });
 
   @override
-  Widget build(BuildContext build){
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -23,7 +26,7 @@ class SquareTile extends StatelessWidget{
         ),
         child: Image.asset(
           imagePath,
-          height: 40,
+          height: height ?? 40, // use passed height or default to 40
         ),
       ),
     );

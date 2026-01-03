@@ -14,7 +14,7 @@ class _StaffHelpSupportPageState extends State<StaffHelpSupportPage> {
         "• How can I view the status of the customer's booking?\n"
             "Authorized staff can use the 'Appointment list' feature to view the upcoming, completed and cancelled booking.\n\n"
             "• Can I change service prices or durations?\n"
-            "Yes, through the 'Content Management' interface, you can add, edit, or delete service details. The system includes safeguards to prevent accidental deletions."
+            "Yes, through the 'Content Management' interface, you can add, edit or delete service details. The system includes safeguards to prevent accidental deletions."
  ),
     ExpansionItem(
         header: "Tutorial: Daily Operation Management",

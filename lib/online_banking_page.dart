@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:magic_touch/customer_main_screen.dart';
 import 'cart_manager.dart';
 import 'fetch_data.dart';
 
@@ -131,11 +132,15 @@ class _OnlineBankingPageState extends State<OnlineBankingPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.pop(context); // Go back
+                  Navigator.pop(context); // Close dialog first
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => CustomerMainScreen()),
+                  );
                 },
                 child: const Text("OK"),
               ),
+
             ],
           ),
         );

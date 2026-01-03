@@ -14,36 +14,73 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
   List<Map<String, String>> messages = [];
   bool isTyping = false; // AI typing indicator
 
+  Future<String> sendTochatbot(String userMessage) async {
+    const String apiKey = "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";
 
-  Future<String> sendToGemini(String userMessage) async {
-    const String apiKey =
-        "AIzaSyBMOIH-wDmLR7K0BdIRUQw9ypE6dOqISSQ"; // Paste your Gemini API key
-
-    final url = Uri.parse(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey",
-    );
+    final url = Uri.parse("https://openrouter.ai/api/v1/chat/completions");
 
     final response = await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Authorization": "Bearer $apiKey",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost",
+        "X-Title": "Flutter Chatbot",
+      },
       body: jsonEncode({
-        "contents": [
+        "model": "mistralai/mistral-7b-instruct","messages": [
           {
-            "parts": [
-              {"text": userMessage}
-            ]
+            "role": "system",
+            "content": """
+            You are a customer service chatbot for a beauty and wellness store.
+            
+            Your job is to answer customer FAQs using ONLY the predefined answers below.
+            Do NOT provide additional explanations.
+            Do NOT give generic answers.
+            Do NOT invent information.
+            
+            FAQ RULES:
+            
+            1. If the user asks about services offered or available services:
+            Reply:
+            "All available services and promotions can be viewed on the Services & Promotions page."
+            
+            2. If the user asks how to make an appointment or booking:
+            Reply:
+            "Press the + button and choose your desired date and available time slot."
+            
+            3. If the user asks about prices or packages:
+            Reply:
+            "Pricing details can be found on the Services & Promotions page."
+            
+            4. If the user asks about customer support or how to contact staff:
+            Reply:
+            "Please go to Contact Us in the Settings section for customer support."
+            
+            5. If the user asks about session duration or how long a session takes:
+            Reply:
+            "Sessions typically last between 10 minutes and up to 1 hour."
+            
+            If the question does NOT match the FAQs above, reply:
+            "I'm here to help with questions about our services, bookings, and store information only."
+            """
+          },
+          {
+            "role": "user",
+            "content": userMessage
           }
-        ]
+        ],
+        "temperature": 0.2,
+        "max_tokens": 120
       }),
     );
 
-    final data = jsonDecode(response.body);
-
-    try {
-      return data["candidates"][0]["content"]["parts"][0]["text"];
-    } catch (e) {
-      return "Error: ${data.toString()}";
+    if (response.statusCode != 200) {
+      return " Please try again later.";
     }
+
+    final data = jsonDecode(response.body);
+    return data["choices"][0]["message"]["content"];
   }
 
   // Ready questions
@@ -71,7 +108,7 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
 
     scrollToBottom();
 
-    String reply = await sendToGemini(message);
+    String reply = await sendTochatbot(message);
 
     setState(() {
       isTyping = false; // Stop typing animation
@@ -80,7 +117,6 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
 
     scrollToBottom();
   }
-
 
   /// Auto-scroll
   void scrollToBottom() {
@@ -338,4 +374,5 @@ class _AnimatedDotsState extends State<AnimatedDots>
     super.dispose();
   }
 }
+
 

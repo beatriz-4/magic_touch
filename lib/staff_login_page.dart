@@ -187,7 +187,8 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
                   SizedBox(height:50),
                   SquareTile(
                       imagePath: 'assets/images/google.png',
-                      onTap: () =>GoogleAuthService().signInWithGoogle()
+                      onTap: () =>GoogleAuthService().signInWithGoogle(),
+                      height: 60,
                   ),
                 ],
               ),

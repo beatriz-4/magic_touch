@@ -132,9 +132,9 @@ class _QRPaymentPageState extends State<QRPaymentPage> {
               ),
               child: Center(
                 child: Image.asset(
-                  'assets/images/Qr.jpeg',
-                  width: 120,
-                  height: 120,
+                  'assets/images/Qr.png',
+                  width: 200,
+                  height: 200,
                 ),
               ),
             ),

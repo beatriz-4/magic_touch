@@ -17,7 +17,7 @@ class _CustomerHelpSupportPageState extends State<CustomerHelpSupportPage> {
         body:
 
         "• How do I create an account?\n"
-            "Sign up using your email or phone number. A verification OTP (One-Time Password) will be sent to secure your account before login.\n\n"
+            "Sign up using your email is available. A Two-Factor Authentication(2FA) will be sent to secure your account before login.\n\n"
             "• How do I confirm my appointment?\n"
             "After selecting a slot, you must complete the payment (deposit or full) and upload your proof of payment. The status will then update to 'Upcoming'.\n\n"
             "• What can the AI Chatbot do?\n"
