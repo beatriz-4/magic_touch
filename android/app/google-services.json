@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746994458144",
+    "project_id": "magic-touch-a71be",
+    "storage_bucket": "magic-touch-a71be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746994458144:android:597c5ae207ab1f3033a645",
+        "android_client_info": {
+          "package_name": "com.example.magic_touch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz8wc1vMybpWn6gf4yOGCQgs7nifx1Jb4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
