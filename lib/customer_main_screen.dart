@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:magic_touch/customer_profile_edit_page.dart';
 import 'package:magic_touch/main.dart';
 import 'customer_profile_page.dart';
 import 'service_appointment_page.dart';

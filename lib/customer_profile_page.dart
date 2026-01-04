@@ -4,7 +4,12 @@ import 'customer_profile_edit_page.dart';
 import 'main.dart';
 import 'fetch_data.dart';
 
-class CustomerProfilePage extends StatelessWidget {
+class CustomerProfilePage extends StatefulWidget {
+  @override
+  _CustomerProfilePageState createState() => _CustomerProfilePageState();
+}
+
+class _CustomerProfilePageState extends State<CustomerProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +19,6 @@ class CustomerProfilePage extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Color(0xFFF2F7E2),
       ),
-
       body: FutureBuilder<Map<String, dynamic>?>(
         future: getUserData(), // fetch all user data
         builder: (context, snapshot) {
@@ -25,13 +29,14 @@ class CustomerProfilePage extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data == null) {
             return Center(child: Text("No user data found"));
           }
+
           final userData = snapshot.data!;
+
           return SingleChildScrollView(
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-
                 // -------------------- LOGO --------------------
                 Container(
                   width: 120,
@@ -47,8 +52,7 @@ class CustomerProfilePage extends StatelessWidget {
                       )
                     ],
                   ),
-                  child: Icon(
-                      Icons.person, size: 70, color: Colors.grey[700]),
+                  child: Icon(Icons.person, size: 70, color: Colors.grey[700]),
                 ),
 
                 SizedBox(height: 20),
@@ -70,29 +74,38 @@ class CustomerProfilePage extends StatelessWidget {
                 // -------------------- PROFILE INFORMATION --------------------
                 _buildInfoTile("Birthday", "${userData['birthday']}"),
                 _buildInfoTile("Phone Number", "${userData['phone']}"),
+                _buildInfoTile("Address", "${userData['address'] ?? ''}"),
 
                 SizedBox(height: 30),
 
+                // -------------------- EDIT PROFILE BUTTON --------------------
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Color(0xFF688E73),
+                    backgroundColor: Color(0xFF688E73),
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder:(context) => CustomerProfileEditPage(),
-                  ),
-                  );
+                  onPressed: () async {
+                    // Navigate to edit page and wait for result
+                    final refresh = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => CustomerProfileEditPage()),
+                    );
+
+                    if (refresh == true) {
+                      // Rebuild widget to refresh FutureBuilder
+                      setState(() {});
+                    }
                   },
-                  child: Text("Edit Profile", style: TextStyle(fontSize: 18, color: Colors.white)),
+                  child: Text("Edit Profile",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
 
                 SizedBox(height: 35),
 
+                // -------------------- LOGOUT BUTTON --------------------
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -100,15 +113,15 @@ class CustomerProfilePage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () async{
+                  onPressed: () async {
                     await FirebaseAuth.instance.signOut();
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => HomePage()),
+                      MaterialPageRoute(builder: (_) => HomePage()),
                     );
                   },
-                  child: Text("Logout", style: TextStyle(fontSize: 18, color: Colors.white)),
+                  child: Text("Logout",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ],
             ),
@@ -137,16 +150,10 @@ class CustomerProfilePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: TextStyle(fontSize: 16)),
-          Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(value,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-

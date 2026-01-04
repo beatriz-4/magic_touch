@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'fetch_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomerProfileEditPage extends StatefulWidget {
   @override
@@ -17,12 +19,12 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  bool isLoading = true; // track loading state
+  bool isLoading = true; // loading state
 
   @override
   void initState() {
     super.initState();
-    loadUserData(); // fetch user data once
+    loadUserData();
   }
 
   Future<void> loadUserData() async {
@@ -32,13 +34,14 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
       emailController.text = data['email'] ?? '';
       phoneController.text = data['phone'] ?? '';
       dobController.text = data['birthday'] ?? '';
+      addressController.text = data['address'] ?? '';
     }
     setState(() {
-      isLoading = false; // hide loader
+      isLoading = false;
     });
   }
 
-  void saveProfile() {
+  Future<void> saveProfile() async {
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Passwords do not match!")),
@@ -46,9 +49,40 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Profile Updated Successfully!")),
-    );
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw "User not logged in";
+
+      // Update Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'birthday': dobController.text.trim(),
+        'address': addressController.text.trim(),
+        if (passwordController.text.isNotEmpty)
+          'password': passwordController.text.trim(), // optional
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Profile Updated Successfully!")),
+      );
+
+      // ✅ Go back to CustomerProfilePage and signal to refresh
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving profile: $e")),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Widget buildField(String label, TextEditingController controller,
@@ -127,14 +161,13 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
                 }
               },
             ),
+            buildField("Address", addressController),
             buildField("Password", passwordController, obscure: true),
-            buildField(
-                "Confirm Password", confirmPasswordController,
+            buildField("Confirm Password", confirmPasswordController,
                 obscure: true),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: saveProfile,
-              child: Text("Save Changes", style: TextStyle(fontSize: 18)),
+              onPressed: isLoading ? null : saveProfile,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF688E73),
                 minimumSize: Size(double.infinity, 55),
@@ -142,6 +175,9 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
+              child: isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text("Save Changes", style: TextStyle(fontSize: 18)),
             ),
           ],
         ),

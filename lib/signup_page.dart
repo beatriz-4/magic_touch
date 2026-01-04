@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:magic_touch/component/square_tile.dart';
-import 'package:magic_touch/customer_login_page.dart';
-import 'package:magic_touch/customer_main_screen.dart';
 import 'package:magic_touch/signIn_with_google.dart';
 import 'email_service.dart';
+import 'customer_login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -22,9 +20,10 @@ class _SignUpPageState extends State<SignUpPage> {
   final phoneController = TextEditingController();
   final birthdayController = TextEditingController();
 
-  bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
 
+  // Manual signup
   Future<void> signUp() async {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -32,29 +31,42 @@ class _SignUpPageState extends State<SignUpPage> {
         confirmPasswordController.text.isEmpty ||
         phoneController.text.isEmpty ||
         birthdayController.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Please fill in all fields")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in all fields")),
+      );
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Passwords do not match")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
+      // Check if email already exists in Firestore
+      final existingUsers = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: emailController.text.trim())
+          .get();
+
+      if (existingUsers.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Account already exists")),
+        );
+        return;
+      }
+
+      // Create Firebase Auth account
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Send Firebase verification email
-      await userCredential.user!.sendEmailVerification();
-
-      // Store user info in Firestore
+      // Add Firestore record
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -66,19 +78,95 @@ class _SignUpPageState extends State<SignUpPage> {
         'role': 'customer',
       });
 
+      // Send email verification
+      await userCredential.user!.sendEmailVerification();
+
+      // Send notification email
+      await EmailService.sendEmail(
+        recipient: emailController.text.trim(),
+        subject: "Welcome!",
+        message: "Hello ${nameController.text.trim()}, your account has been successfully created.",
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Account created! Check email to verify.")),
       );
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => CustomerLoginPage()),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
+  // Google signup
+  Future<void> signUpWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      User? googleUser = await _authService.signInWithGoogle();
+      if (googleUser == null) return;
+
+      // Check Firestore
+      final existingUsers = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: googleUser.email)
+          .get();
+
+      if (existingUsers.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Account already exists")),
+        );
+        return;
+      }
+
+      // Firestore record
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(googleUser.uid)
+          .set({
+        'email': googleUser.email,
+        'name': googleUser.displayName ?? '',
+        'phone': '',
+        'birthday': '',
+        'role': 'customer',
+      });
+
+      // Notification email
+      await EmailService.sendEmail(
+        recipient: googleUser.email!,
+        subject: "Welcome!",
+        message: "Hello ${googleUser.displayName}, your account has been successfully created.",
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account created! Check email.")),
+      );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => CustomerLoginPage()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // Date picker
   Future<void> _pickDate() async {
     DateTime? picked = await showDatePicker(
       context: context,
@@ -87,8 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() =>
-      birthdayController.text = DateFormat('yyyy-MM-dd').format(picked));
+      setState(() => birthdayController.text = DateFormat('yyyy-MM-dd').format(picked));
     }
   }
 
@@ -119,15 +206,13 @@ class _SignUpPageState extends State<SignUpPage> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              // Name
+              // Manual signup fields
               TextField(
                 controller: nameController,
                 decoration: _inputDecoration("Full Name"),
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Phone
               TextField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
@@ -135,28 +220,22 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Email
               TextField(
                 controller: emailController,
                 decoration: _inputDecoration("Email"),
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Birthday
               TextField(
                 controller: birthdayController,
                 readOnly: true,
                 onTap: _pickDate,
                 decoration: _inputDecoration("Birthday").copyWith(
-                    suffixIcon:
-                    const Icon(Icons.calendar_today, color: Colors.white)),
+                    suffixIcon: const Icon(Icons.calendar_today, color: Colors.white)
+                ),
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Password
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -164,8 +243,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Confirm Password
               TextField(
                 controller: confirmPasswordController,
                 obscureText: true,
@@ -174,7 +251,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 30),
 
-              // Sign Up Button
+              // Manual Sign Up Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -185,71 +262,70 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                      : const Text("Sign Up", style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 35),
 
-              // OR Divider
+              const SizedBox(height: 35),
               const Row(
                 children: [
-                  Expanded(
-                      child: Divider(thickness: 1.5, color: Colors.grey)),
+                  Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       "Or continue with",
                       style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
-                  Expanded(
-                      child: Divider(thickness: 1.5, color: Colors.grey)),
+                  Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
                 ],
               ),
               const SizedBox(height: 35),
 
-              // Google Sign-In Button
-              SquareTile(
-                imagePath: 'assets/images/google.png',
-                onTap: () async {
-                  User? user = await _authService.signInWithGoogle();
-
-                  if (user != null && mounted) {
-                    // Send notification email after Google login
-                    await EmailService.sendEmail(
-                      recipient: user.email!,
-                      subject: "Welcome to MagicTouch!",
-                      message:
-                      "Hello ${user.displayName}, you have successfully logged in.",
-                    );
-
-                    // Navigate to main screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => CustomerMainScreen()),
-                    );
-                  }
-                },
-              ),
-
-              const SizedBox(height: 35),
-
-              // Navigate to Login
-              GestureDetector(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => CustomerLoginPage())),
-                child: const Text(
-                  "Already have an account? Login",
-                  style: TextStyle(color: Color(0xFF688E73)),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : signUpWithGoogle,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    backgroundColor: Colors.white,
+                    elevation: 3,
+                    side: const BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min, // ✅ PREVENTS RenderFlex overflow
+                    children: [
+                      Image.asset(
+                        'assets/images/google.png',
+                        height: 24,
+                        width: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Sign up with Google",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+
+
+
             ],
           ),
         ),

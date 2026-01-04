@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:magic_touch/signIn_with_google.dart';
 import 'package:magic_touch/signup_page.dart';
-import 'component/square_tile.dart';
 import 'forgot_password_page.dart';
 import 'customer_main_screen.dart';
-import 'fetch_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'email_service.dart';
 
 class CustomerLoginPage extends StatefulWidget {
   @override
@@ -17,7 +17,9 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleAuthService _authService = GoogleAuthService();
 
+  // Manual email/password login
   Future<void> loginCustomer() async {
     String email = emailController.text.trim();
     String password = passwordController.text;
@@ -29,9 +31,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -39,32 +39,106 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
         password: password,
       );
 
-      final userData = await getUserData(); // call your library function
-      final role = userData?['role'] ?? 'guest';
+      // Fetch Firestore document
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
 
-      if (role == 'customer') {
+      if (userDoc.exists && userDoc['role'] == 'customer') {
+        // Send notification email
+        await EmailService.sendEmail(
+          recipient: userDoc['email'],
+          subject: "Welcome Back!",
+          message: "Hello ${userDoc['name']}, you have logged in successfully.",
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Login successful!")),
         );
+
+        // ✅ Navigate to CustomerMainScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CustomerMainScreen()),
         );
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Access denied: Not a customer account.")),
         );
       }
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
+  }
 
+  // Google Sign-In
+  Future<void> loginWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      User? user = await _authService.signInWithGoogle();
+
+      if (user == null) return;
+
+      // Check Firestore document
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (userDoc.exists) {
+        // Account exists
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login successful!")),
+        );
+
+        // ✅ Navigate to CustomerMainScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CustomerMainScreen()),
+        );
+
+        // Send notification email
+        await EmailService.sendEmail(
+          recipient: userDoc['email'],
+          subject: "Welcome Back!",
+          message: "Hello ${userDoc['name']}, you have logged in successfully.",
+        );
+
+      } else {
+        // Create new Firestore document for Google account
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'email': user.email,
+          'name': user.displayName ?? '',
+          'role': 'customer',
+        });
+
+        // Send welcome email
+        await EmailService.sendEmail(
+          recipient: user.email!,
+          subject: "Welcome!",
+          message: "Hello ${user.displayName}, your account has been created.",
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Account created. Please log in.")),
+        );
+      }
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -123,7 +197,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                 ),
               ),
             ),
-            SizedBox(height: 70),
+            SizedBox(height: 50),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -138,42 +212,41 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                     : Text("Next"),
               ),
             ),
-            SizedBox(height: 100),
-            Row(
-              children: [
-                Expanded(
-                    child:
-                    Divider(thickness: 1.5, color: Colors.grey)),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    "Or continue with",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
+            SizedBox(height: 30),
+            Text("Or continue with", style: TextStyle(color: Colors.grey)),
+            SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : loginWithGoogle,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  backgroundColor: Colors.white,
+                  elevation: 3,
+                  side: BorderSide(color: Colors.grey),
                 ),
-                Expanded(
-                    child:
-                    Divider(thickness: 1.5, color: Colors.grey)),
-              ],
-            ),
-            SizedBox(height:50),
-            SquareTile(
-                imagePath: 'assets/images/google.png',
-                onTap: () =>GoogleAuthService().signInWithGoogle(),
-                height: 60,
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.black)
+                    : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/google.png',
+                      height: 24,
+                    ),
+                    SizedBox(width: 10),
+                    Text("Sign in with Google", style: TextStyle(color: Colors.black)),
+                  ],
+                ),
+              ),
             ),
             SizedBox(height: 50),
             GestureDetector(
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => SignUpPage()));
+                  context,
+                  MaterialPageRoute(builder: (_) => SignUpPage()),
+                );
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -182,13 +255,13 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                     "Not a member?",
                     style: TextStyle(color: Color(0xFF688E73)),
                   ),
+                  SizedBox(width: 5),
                   Text(
                     "Register Now",
                     style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                   ),
                 ],
-              )
-
+              ),
             ),
           ],
         ),
