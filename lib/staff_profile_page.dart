@@ -76,18 +76,6 @@ class StaffProfilePage extends StatelessWidget {
 
                   SizedBox(height: 25),
 
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:Color(0xFF688E73),
-                      minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () {},
-                    child: Text("Edit Profile", style: TextStyle(fontSize: 18, color: Colors.white)),
-                  ),
-
-                  SizedBox(height: 25),
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "flutter-app-5df3f",
+    "prod": "magic-touch-a71be"
+  },
+  "targets": {},
+  "etags": {}
+}

@@ -1,55 +1,51 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-/// A service class to handle Google Sign-In
-// and authentication using Firebase.
 class GoogleAuthService {
-
-  // FirebaseAuth instance to handle authentication.
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // GoogleSignIn instance to handle Google Sign-In.
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  // 1. MUST use the Web Client ID here for Android to show the popup
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: '746994458144-2r1nbs6stu7p6e37bsqrcb40q2o3bcrm.apps.googleusercontent.com',
+  );
 
-  /// Signs in the user with Google and returns the authenticated Firebase [User].
-  ///
-  /// Returns `null` if the sign-in process is canceled or fails.
   Future<User?> signInWithGoogle() async {
     try {
-      // Trigger the Google Sign-In flow.
-      final googleUser = await _googleSignIn.signIn();
+      print("DEBUG: Google Sign-In started...");
 
-      // User canceled the sign-in.
-      if (googleUser == null) return null;
+      // 2. This command triggers the "Choose an Account" window
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      // Retrieve the authentication details from the Google account.
-      final googleAuth = await googleUser.authentication;
+      if (googleUser == null) {
+        print("DEBUG: User closed the window without picking an account.");
+        return null;
+      }
 
-      // Create a new credential using the Google authentication details.
+      print("DEBUG: Account selected: ${googleUser.email}");
+
+      // 3. Get the tokens from the selection
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase with the Google credential.
-      final userCredential = await _auth.signInWithCredential(credential);
+      // 4. Sign in to Firebase
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
 
-      // Return the authenticated user.
+      print("DEBUG: Successfully signed in to Firebase!");
       return userCredential.user;
+
     } catch (e) {
-      // Print the error and return null if an exception occurs.
-      print("Sign-in error: $e");
+      // 5. This will tell us if it's a DEVELOPER_ERROR or missing Support Email
+      print("DEBUG: CRITICAL ERROR: $e");
       return null;
     }
   }
 
-  /// Signs out the user from both Google and Firebase.
   Future<void> signOut() async {
-
-    // Sign out from Google.
     await _googleSignIn.signOut();
-
-    // Sign out from Firebase.
     await _auth.signOut();
   }
 }

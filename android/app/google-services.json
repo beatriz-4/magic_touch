@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:746994458144:android:597c5ae207ab1f3033a645",
+        "mobilesdk_app_id": "1:746994458144:android:9203211cca5c68c533a645",
         "android_client_info": {
-          "package_name": "com.example.magic_touch"
+          "package_name": "com.company.magic_touch"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "746994458144-2r1nbs6stu7p6e37bsqrcb40q2o3bcrm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBz8wc1vMybpWn6gf4yOGCQgs7nifx1Jb4"
@@ -20,7 +25,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746994458144-2r1nbs6stu7p6e37bsqrcb40q2o3bcrm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746994458144-ghj018nljdhil8fjumtk5io5c1lt5urp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.magicTouch"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746994458144:android:597c5ae207ab1f3033a645",
+        "android_client_info": {
+          "package_name": "com.example.magic_touch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746994458144-83doe15b9piv66q5e3kmq8vqq1cjkh3d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.magic_touch",
+            "certificate_hash": "243f6ef79568e8cd78d39aadd0de3ed7e2580d46"
+          }
+        },
+        {
+          "client_id": "746994458144-2r1nbs6stu7p6e37bsqrcb40q2o3bcrm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz8wc1vMybpWn6gf4yOGCQgs7nifx1Jb4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746994458144-2r1nbs6stu7p6e37bsqrcb40q2o3bcrm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746994458144-ghj018nljdhil8fjumtk5io5c1lt5urp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.magicTouch"
+              }
+            }
+          ]
         }
       }
     }

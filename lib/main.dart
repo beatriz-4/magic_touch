@@ -2,18 +2,29 @@ import 'package:flutter/material.dart';
 import 'splash_page.dart';
 import 'signup_page.dart';
 import 'login_page.dart';
-import 'customer_main_screen.dart'; // Make sure this exists
+import 'customer_main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'fetch_data.dart';
+// 1. Import the App Check package
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(MyApp());
+  // 2. Initialize App Check
+  // This helps secure your backend and stops the "No AppCheckProvider" errors
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    appleProvider: AppleProvider.deviceCheck,
+  );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -141,4 +152,5 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
 }
