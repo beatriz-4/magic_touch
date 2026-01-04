@@ -303,7 +303,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ? const CircularProgressIndicator(color: Colors.black)
                       : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min, // ✅ PREVENTS RenderFlex overflow
+                    mainAxisSize: MainAxisSize.min, // PREVENTS RenderFlex overflow
                     children: [
                       Image.asset(
                         'assets/images/google.png',

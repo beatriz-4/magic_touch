@@ -4,7 +4,7 @@ import 'package:magic_touch/main.dart';
 import 'promotion_page.dart';
 import 'cart_page.dart';
 import 'fetch_data.dart';
-import 'cart_manager.dart'; // ✅ import CartManager
+import 'cart_manager.dart';
 
 class ServicesAppointmentPage extends StatefulWidget {
   const ServicesAppointmentPage({super.key});
@@ -107,7 +107,7 @@ class _ServicesAppointmentPageState extends State<ServicesAppointmentPage> {
         });
       }
 
-      // ✅ Save globally to CartManager
+      // Save globally to CartManager
       CartManager.instance.selectedItems = List.from(selectedServices);
     });
   }
@@ -227,7 +227,7 @@ class _ServicesAppointmentPageState extends State<ServicesAppointmentPage> {
                         selectedTime = TimeOfDay(hour: start, minute: 0);
                       });
 
-                      // ✅ Use _formatDate and _formatTime to pass strings
+                      // Use _formatDate and _formatTime to pass strings
                       final dateStr = _formatDate(selectedDate);
                       final timeStr = _formatTime(selectedTime);
 
@@ -273,7 +273,7 @@ class _ServicesAppointmentPageState extends State<ServicesAppointmentPage> {
     setState(() {
       counters = List.filled(services.length, 0);
       selectedServices.clear();
-      CartManager.instance.clearCart(); // ✅ clear global cart too
+      CartManager.instance.clearCart(); // clear global cart too
     });
   }
 

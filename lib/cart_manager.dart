@@ -1,3 +1,4 @@
+//handle cart item across different files
 class CartManager {
   CartManager._privateConstructor();
   static final CartManager instance = CartManager._privateConstructor();

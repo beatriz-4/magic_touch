@@ -28,7 +28,7 @@ class _ViewFeedbackPageState extends State<ViewFeedbackPage> {
       ),
       body: Column(
         children: [
-          // 🔹 FILTER CHIPS
+          // FILTER CHIPS
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -44,7 +44,7 @@ class _ViewFeedbackPageState extends State<ViewFeedbackPage> {
             ),
           ),
 
-          // 🔹 FEEDBACK LIST
+          // FEEDBACK LIST
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _buildQuery(),
@@ -191,7 +191,7 @@ class _ViewFeedbackPageState extends State<ViewFeedbackPage> {
                               ),
                             ),
 
-                            // 🔹 BODY
+                            //  BODY
                             Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
@@ -239,7 +239,7 @@ class _ViewFeedbackPageState extends State<ViewFeedbackPage> {
     );
   }
 
-  // 🔹 FILTER CHIP
+  // FILTER CHIP
   Widget _buildFilterChip(String label) {
     final isSelected = _selectedFilter == label;
 
@@ -271,7 +271,7 @@ class _ViewFeedbackPageState extends State<ViewFeedbackPage> {
     );
   }
 
-  // 🔹 QUERY (NO INDEX ERROR)
+  // QUERY (NO INDEX ERROR)
   Stream<QuerySnapshot> _buildQuery() {
     final collection =
     FirebaseFirestore.instance.collection('feedback');

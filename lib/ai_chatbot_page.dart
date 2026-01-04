@@ -231,7 +231,7 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
             ),
           ),
 
-          // 🔹 Chat messages
+          // Chat messages
           Expanded(
             child: ListView.builder(
               controller: scrollController,
@@ -286,7 +286,7 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
             ),
           ),
 
-          // 🔹 Input Box
+          //Input Box
           Container(
             padding:
             const EdgeInsets.symmetric(horizontal: 30, vertical: 27),

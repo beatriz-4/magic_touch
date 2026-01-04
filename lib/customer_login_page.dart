@@ -57,7 +57,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
           SnackBar(content: Text("Login successful!")),
         );
 
-        // ✅ Navigate to CustomerMainScreen
+        // Navigate to CustomerMainScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CustomerMainScreen()),
@@ -99,7 +99,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
           SnackBar(content: Text("Login successful!")),
         );
 
-        // ✅ Navigate to CustomerMainScreen
+        // Navigate to CustomerMainScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CustomerMainScreen()),

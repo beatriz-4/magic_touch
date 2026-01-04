@@ -77,7 +77,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
     });
   }
 
-  // 🔥 Navigation Handler for bottom nav
+  // Navigation Handler for bottom nav
   void _onNavTap(int index) {
     setState(() => _currentIndex = index);
 
@@ -107,7 +107,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
     }
   }
 
-  // 🔥 Guest redirect helper
+  // Guest redirect helper
   void _redirectGuestToHome() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -139,7 +139,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
 
       body: Column(
         children: [
-          // 🔥 Top Auto-Slider
+          // Top Auto-Slider
           Container(
             height: 180,
             child: PageView.builder(
@@ -159,7 +159,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
 
           SizedBox(height: 16),
 
-          // 🔥 GRID MENU
+          // GRID MENU
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -254,7 +254,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
         ],
       ),
 
-      // 🔥 Custom Bottom Navigation Bar
+      // Custom Bottom Navigation Bar
       bottomNavigationBar: Stack(
         alignment: Alignment.center,
         children: [
@@ -330,7 +330,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen> {
     );
   }
 
-  // 🔥 Card builder
+  // Card builder
   Widget _menuCard(String title, Color color, IconData icon) {
     return Card(
       color: color,

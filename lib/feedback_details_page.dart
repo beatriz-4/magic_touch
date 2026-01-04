@@ -35,7 +35,7 @@ class _FeedbackDetailsPageState extends State<FeedbackDetailsPage> {
     }
   }
 
-  // 🔹 SUBMIT REPLY → SET IN PROGRESS
+  // SUBMIT REPLY → SET IN PROGRESS
   Future<void> _submitReply() async {
     if (_replyController.text.trim().isEmpty) return;
 
@@ -65,7 +65,7 @@ class _FeedbackDetailsPageState extends State<FeedbackDetailsPage> {
     );
   }
 
-  // 🔹 RESOLVE BUTTON
+  // RESOLVE BUTTON
   Future<void> _resolveFeedback() async {
     await FirebaseFirestore.instance
         .collection('feedback')

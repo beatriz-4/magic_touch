@@ -9,24 +9,24 @@ class GoogleAuthService {
 
   Future<User?> signInWithGoogle() async {
     try {
-      // 1️⃣ Sign out any previous Google session
+      //1.  Sign out any previous Google session
       await _googleSignIn.signOut();
 
-      // 2️⃣ Show account picker
+      // 2. Show account picker
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null; // user canceled
 
-      // 3️⃣ Get authentication tokens
+      // 3. Get authentication tokens
       final GoogleSignInAuthentication googleAuth =
       await googleUser.authentication;
 
-      // 4️⃣ Create Firebase credential
+      // 4. Create Firebase credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // 5️⃣ Sign in with Firebase
+      // 5. Sign in with Firebase
       UserCredential userCredential = await _auth.signInWithCredential(credential);
       return userCredential.user;
     } catch (e) {

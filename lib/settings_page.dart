@@ -124,7 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // 🔹 Reusable Stylish Button
+  // Reusable Stylish Button
   Widget _settingButton({
     required String title,
     required IconData icon,

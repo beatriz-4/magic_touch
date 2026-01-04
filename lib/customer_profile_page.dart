@@ -37,7 +37,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // -------------------- LOGO --------------------
+                // photo
                 Container(
                   width: 120,
                   height: 120,
@@ -71,14 +71,14 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
                 SizedBox(height: 20),
 
-                // -------------------- PROFILE INFORMATION --------------------
+                //  profile info
                 _buildInfoTile("Birthday", "${userData['birthday']}"),
                 _buildInfoTile("Phone Number", "${userData['phone']}"),
                 _buildInfoTile("Address", "${userData['address'] ?? ''}"),
 
                 SizedBox(height: 30),
 
-                // -------------------- EDIT PROFILE BUTTON --------------------
+                //  edit profile button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF688E73),
@@ -105,7 +105,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
                 SizedBox(height: 35),
 
-                // -------------------- LOGOUT BUTTON --------------------
+                // logout button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,

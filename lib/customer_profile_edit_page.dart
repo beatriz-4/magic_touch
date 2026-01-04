@@ -72,7 +72,7 @@ class _CustomerProfileEditPageState extends State<CustomerProfileEditPage> {
         SnackBar(content: Text("Profile Updated Successfully!")),
       );
 
-      // ✅ Go back to CustomerProfilePage and signal to refresh
+      // Go back to CustomerProfilePage and signal to refresh
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
