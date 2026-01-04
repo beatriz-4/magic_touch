@@ -130,7 +130,6 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -231,7 +230,6 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
